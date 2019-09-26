@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.primefaces.json.JSONArray;
 import org.primefaces.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,8 @@ import br.com.gescor.gescorkafka.model.Parameter;
 
 @Service
 public class GescorServiceImpl implements GescorService{
+	
+	private static final Logger logger = LoggerFactory.getLogger(GescorServiceImpl.class);
 
 	@Autowired
 	private Parameter parameter;
@@ -30,20 +34,21 @@ public class GescorServiceImpl implements GescorService{
 	@Autowired
 	private SegDao dao;
 	
-
-	
 	@Override
 	public String loadInsured () {
+		logger.info("#### loadInsured");
 		
 		List<Insured> insureds = this.dao.buscarSegurados(parameter.getPathDB());
+		
+		logger.info("#### Insured >>> " + insureds.size());
 		try {
 			JSONArray jsonArray = this.criarJsonArray(insureds);
 			
 			String json = jsonArray.toString();
 			
-			System.out.println(json);
+			logger.info("#### Insured >>> " + json);
 			
-			//this.producer.sendMessage(json);
+			this.producer.sendMessage(json);
 			
 			return "OK";
 			
